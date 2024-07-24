@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User CRUD Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+<div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
+    <h1 class="text-2xl font-bold mb-6">User CRUD Operations</h1>
+
+    <form id="userForm" class="mb-6">
+        <div class="mb-4">
+            <label for="userId" class="block text-gray-700 text-sm font-bold mb-2">User ID:</label>
+            <input type="text" id="userId" name="userId" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+            <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="age" class="block text-gray-700 text-sm font-bold mb-2">Age:</label>
+            <input type="number" id="age" name="age" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="flex justify-between">
+            <button type="button" onclick="createUser()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create User</button>
+            <button type="button" onclick="updateUser()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Update User</button>
+        </div>
+    </form>
+
+    <div class="mb-6">
+        <input type="text" id="readUserId" placeholder="Enter User ID" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+        <button onclick="readUser()" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Read User</button>
+    </div>
+
+    <div class="mb-6">
+        <input type="text" id="deleteUserId" placeholder="Enter User ID" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+        <button onclick="deleteUser()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Delete User</button>
+    </div>
+
+    <div id="message" class="mt-4 text-sm text-gray-600"></div>
+</div>
+
+<script>
+    const API_URL = '/user';
+
+    function createUser() {
+        const userId = document.getElementById('userId').value;
+        const name = document.getElementById('name').value;
+        const age = document.getElementById('age').value;
+        const user = { userId, name, age };
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        })
+        .then(response => response.text())
+        .then(message => {
+            document.getElementById('message').textContent = message;
+            document.getElementById('userForm').reset();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function updateUser() {
+        const userId = document.getElementById('userId').value;
+        const name = document.getElementById('name').value;
+        const age = document.getElementById('age').value;
+        const user = { userId, name, age };
+
+        fetch(API_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        })
+        .then(response => response.text())
+        .then(message => {
+            document.getElementById('message').textContent = message;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function readUser() {
+        const userId = document.getElementById('readUserId').value;
+        fetch(`${API_URL}/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userId').value = user.userId;
+                document.getElementById('name').value = user.name;
+                document.getElementById('age').value = user.age;
+                document.getElementById('message').textContent = 'User found';
+            })
+            .catch(() => {
+                document.getElementById('message').textContent = 'User not found';
+            });
+    }
+
+    function deleteUser() {
+        const userId = document.getElementById('deleteUserId').value;
+        fetch(`${API_URL}/${userId}`, { method: 'DELETE' })
+            .then(response => response.text())
+            .then(message => {
+                document.getElementById('message').textContent = message;
+                document.getElementById('userForm').reset();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
